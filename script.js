@@ -1,68 +1,84 @@
-// FUNZIONI GENERALI
-
 let bowling = {
-    "playerList": [
-        {"name": "Fgg", "score": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+    playerList: [
+        { name: "Frenk", score: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
     ],
-    "setScore": function(){
-        this.playerList.forEach( (player)=> {
-            for (let i = 0; i < 10; i++) {
-                player.score.push( Math.floor( Math.random()* (10 - 1 +1) + 1) )
-            }
-        } )
-    },
-    "setFinalScore": function(){
-        this.playerList.forEach( (player)=> {
-            player.FinalScore = player.score.reduce( (acc, num)=> acc + num, 0)
-        })
-    },
-    "setWinner": function(){
-        this.playerList.sort( (a, b) => b.FinalScore - a.FinalScore )
-
-        console.log(`Il vincitore è : ${this.playerList[0].name} con ${this.playerList[0].FinalScore} punti`);
-    },
-    "addNewPlayer": function(PlayerName){
-        this.playerList.push({"nome": PlayerName, "score": []});
-    },
-    "createTableRow": function (){
-        this.playerList.forEach((player, index)=>{
-           let tr = document.createElement("tr")
-           tr.innerHTML = `
-          <th scope="row">${index + 1}</th>
-            <td>${player.name}</td>
-            <td>${player.score[0]}</td>
-            <td>${player.score[1]}</td>
-            <td>${player.score[2]}</td>
-            <td>${player.score[3]}</td>
-            <td>${player.score[4]}</td>
-            <td>${player.score[5]}</td>
-            <td>${player.score[6]}</td>
-            <td>${player.score[7]}</td>
-            <td>${player.score[8]}</td>
-            <td>${player.score[9]}</td>
-            <td>${player.score[10]}</td>
-            <td>0</td>
-           `
-           listPlayer.appendChild(tr)
+    
+    "addNewPlayer": function (playerName) {
+        if (!playerName.trim()) {
+            alert("Inserisci un nome valido!");
+            return;
         }
-        );
+        this.playerList.push({ name: playerName, score: new Array(10).fill(0) });
+        this.updateTable();
     },
-}
+    
+    "gameStarter": function () {
+        let currentPlayerIndex = 0;
+        
+        let intervalId = setInterval(() => {
+            if (currentPlayerIndex < this.playerList.length) {
+                let player = this.playerList[currentPlayerIndex];
+                for (let i = 0; i < 11; i++) {
+                    player.score[i] = Math.floor(Math.random() * 11);
+                }
+                this.updateTable();
+                currentPlayerIndex++;
+            } else {
+                clearInterval(intervalId); 
+            }
+        }, 1400); 
+    },
 
+    "setWinner": function () {
+        this.playerList.forEach(player => {
+            player.totalScore = player.score.reduce((acc, num) => acc + num, 0);
+        });
+        this.playerList.sort((a, b) => b.totalScore - a.totalScore);
+        this.updateTable();
+    },
+    
+    "playerRemover": function (playerName) {
+        this.playerList = this.playerList.filter(player => player.name !== playerName);
+        this.updateTable();
+    },
 
+    "updateTable": function () {
+        let listPlayer = document.querySelector("#listPlayer");
+        listPlayer.innerHTML = ""; 
 
-let listPlayer = document.querySelector("#listPlayer")
+        this.playerList.forEach((player, index) => {
+            let totalScore = player.score.reduce((acc, num) => acc + num, 0);
 
-bowling.createTableRow()
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <th scope="row">${index + 1}</th>
+                <td>${player.name}</td>
+                ${player.score.map(score => `<td>${score}</td>`).join("")}
+                <td>${totalScore}</td>
+            `;
+            listPlayer.appendChild(tr);
+        });
+    },
+};
 
-// ADD PLAYER
+let addPlayer = document.querySelector("#addPlayer");
+let namePlayerInput = document.querySelector("#namePlayerInput");
+let startGame = document.querySelector("#startGame");
+let leaderboardViev = document.querySelector("#leaderboardView");
 
-let addNewPlayer = document.querySelector("#addPlayer")
+addPlayer.addEventListener("click", (event) => {
+    event.preventDefault();
+    bowling.addNewPlayer(namePlayerInput.value);
+    namePlayerInput.value = "";
+});
 
-let nameNewPlayer = document.querySelector("#newPlayerName")
+startGame.addEventListener("click", () => {
+    leaderboardViev.classList.remove("d-none");
+    bowling.gameStarter();
+});
 
-addNewPlayer.addEventListener("click", ()=>{
-    bowling.addNewPlayer(nameNewPlayer.value)
-    bowling.createTableRow()
-    nameNewPlayer.value = ""
-})
+leaderboardViev.addEventListener("click", () => {
+    bowling.setWinner();
+});
+
+bowling.updateTable();

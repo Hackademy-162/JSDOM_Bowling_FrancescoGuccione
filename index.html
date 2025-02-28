@@ -21,17 +21,19 @@
             <div class="col-6 col-lg-4">
                 <form>
                     <div class="row mb-3">
-                      <label for="newPlayerName" class="col-sm-2 col-form-label fw-bold">Player</label>
+                      <label for="namePlayerInput" class="col-sm-2 col-form-label fw-bold">Nome</label>
                       <div class="col-sm-10">
-                        <input type="text" class="form-control" id="newPlayerName">
+                        <input type="text" class="form-control" id="namePlayerInput">
                       </div>
                     </div>
-                    <button class="btn btn-secondary">Aggiungi</button>
+                    <button id="addPlayer" class="btn btn-secondary">Aggiungi</button>
+                    <button id="removePlayer" class="btn btn-secondary">Reset</button>
                 </form>
             </div>
         
             <div class="col-6 col-lg-4">
-                <button id="addPlayer" class="btn btn-secondary">Inizia</button>
+                <button id="startGame" class="btn btn-secondary">Inizia</button>
+                <button id="leaderboardView" class="btn btn-secondary d-none">Classifica</button>
             </div>
         </div>
     </div>
